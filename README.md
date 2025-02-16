@@ -25,8 +25,10 @@ Este documento se divide en las siguientes secciones:
 ### 2.1 Restricciones de Diseño
 
 ***Técnicas***
-- Uso de un Arduino Uno como microcontrolador central.
-- Sensores de temperatura, gas (MQ-2) y llama (KY-026).
+- Uso de un Arduino Uno como microcontrolador central. Ya que "es una plataforma de desarrollo basada en una placa electrónica de hardware libre que incorpora un microcontrolador re-programable y una serie de pines hembra" [1], esto permite establecer conexiones entre el microcontrolador y los sendroes y actuadores, tiene entradas analogas y digitales.
+- Sensor de temperatura KY-028, "permite medir la temperatura a través de un termistor NTC, un comparador LM393, y un potenciometro"[2], esto le permite al sensor adecuar una señal de trabajo operable digital.
+- Sensor de gas (MQ-2), "Este sensor es adecuado para detectar GLP, I-butano, propano, metano, alcohol, hidrógeno y humo. Tiene alta sensibilidad y respuesta rápida"[3], ademas de esto cuenta con un potenciometrp para ajustar la sensibilidad.
+- Sensor de Llama (KY-026). "Consta de un LED receptor de infrarrojos de 5 mm, un comparador diferencial dual LM393, un potenciómetro de recorte de 3296 W, 6 resistencias, y 4 pines de cabezal macho"[4] Es decir que detecta la luz infrarroja emitida por el fuego, y debido a su potenciometro se puede ajustar su sensibilidad.
 - Pantalla LCD para visualización de datos en tiempo real.
 - Buzzer para alertas sonoras en caso de detección de incendio.
   
@@ -47,7 +49,9 @@ Este documento se divide en las siguientes secciones:
 
 ***Arquitectura IoT del Sistema***
 
-La arquitectura IoT del sistema de detección de incendios en los cerros orientales de Bogotá se basa en una estructura distribuida compuesta por sensores, procesamiento local y comunicación de datos para la notificación de alertas. Se organiza en tres capas principales:
+La arquitectura IoT permite la transmisión de información digitalizada a través de la red, llevando los datos capturados por los sensores hacia un centro de procesamiento local o en la nube, donde son analizados y almacenados. Posteriormente, mediante actuadores, se pueden emitir comandos para que los dispositivos conectados ejecuten acciones específicas, como la activación o desactivación de un mecanismo. [5]
+
+El sistema de detección de incendios en los cerros orientales de Bogotá se basa en una estructura distribuida compuesta por sensores, procesamiento local y comunicación de datos para la notificación de alertas. Se organiza en tres capas principales:
 
 1. Capa de Percepción (Sensores y Adquisición de Datos)
 Es la capa encargada de capturar la información del entorno mediante sensores físicos. Los dispositivos utilizados incluyen:
@@ -362,3 +366,18 @@ En esta imagen se puede observar que el nivel de gas se encuentra dentro de los 
 ![.](imagenesWiki/img4.jpg)
 
 En la imagen se muestra la prueba del sensor de llama, donde al acercar un encendedor encendido, el sistema detecta la presencia de fuego. Como resultado, se activa una alarma y en la pantalla LCD aparece el mensaje "ALERTA: FUEGO"
+
+
+## 7. Referencias 
+
+ 1: Arduino.cl, "¿Qué es Arduino?", https://arduino.cl/que-es-arduino/ (accedido: 16 de febrero de 2025). 
+ 
+ 2: Robotlandia, "Módulo KY-028 Sensor de Temperatura Digital", https://robotlandia.es/temperatura-y-humedad/681-modulo-ky-028-sensor-de-temperatura-digital.html (accedido: 16 de febrero de 2025).
+
+ 3: Julpin, "Módulo Sensor Analógico de Gas MQ-2 para Arduino", https://www.julpin.com.co/inicio/modulos-sensores/492-modulo-sensor-analogico-de-gas-mq-2-para-arduino.html (accedido: 16 de febrero de 2025).
+
+ 4: D Bots, "KY-026 Módulo Sensor de Llama", https://3dbots.co/producto/ky-026-modulo-sensor-de-llama/ (accedido: 16 de febrero de 2025).
+
+ 5: UNIR, "¿Qué es la arquitectura IoT y dónde se emplea?", https://www.unir.net/revista/ingenieria/arquitectura-iot/ (accedido: 16 de febrero de 2025).
+
+6: A. Cortés, "Proyecto 14: Módulo Sensor de Llama", https://acortes.co/proyecto-14-modulo-sensor-de-llama/ (accedido: 16 de febrero de 2025).

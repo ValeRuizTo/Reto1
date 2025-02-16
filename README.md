@@ -21,39 +21,59 @@ Este documento se divide en las siguientes secciones:
 - Conclusiones y Trabajo Futuro: Reflexión sobre los logros alcanzados y posibles mejoras.
 - Anexos: Código fuente, esquemáticos y material complementario.
 
+## 2. Solución Propuesta
+### 2.1 Restricciones de Diseño
 
-Solución Propuesta
-2.1 Restricciones de Diseño
-Técnicas
-Uso de un Arduino Uno como microcontrolador central.
-Sensores de temperatura (DHT11), gas (MQ-2) y llama (KY-026).
-Pantalla LCD para visualización de datos en tiempo real.
-Buzzer para alertas sonoras en caso de detección de incendio.
-Alimentación mediante fuente de 5V para garantizar estabilidad.
-Económicas
-Implementación con componentes de bajo costo y accesibles.
-Optimización del hardware para evitar gastos innecesarios.
-Uso de software de código abierto para minimizar costos de desarrollo.
-Regulatorias
-Cumplimiento de normativas de seguridad eléctrica y electrónica.
-Uso de sensores certificados para la detección de gases y temperatura.
-Diseño adaptado a condiciones ambientales de los cerros orientales.
-Espacio y Escalabilidad
-Diseño compacto para facilitar su instalación en zonas estratégicas.
-Posibilidad de ampliar el sistema mediante comunicación con otros dispositivos IoT.
-Adaptabilidad para futuras mejoras con nuevos sensores o algoritmos de detección.
-Temporales
-Desarrollo del prototipo en un plazo limitado, asegurando funcionalidad básica.
-Posibilidad de mejoras futuras en algoritmos y hardware para mayor precisión.
-2.2 Arquitectura Propuesta
-Diagrama de Bloques (Hardware y Software)
-El sistema se compone de los siguientes módulos:
+***Técnicas***
+- Uso de un Arduino Uno como microcontrolador central.
+- Sensores de temperatura, gas (MQ-2) y llama (KY-026).
+- Pantalla LCD para visualización de datos en tiempo real.
+- Buzzer para alertas sonoras en caso de detección de incendio.
+  
+***Económicas***
+- Implementación con componentes de bajo costo y accesibles.
+- Uso de software de arduino para minimizar costos de desarrollo.
+  
+***Espacio y Escalabilidad***
+- Diseño compacto para facilitar su instalación en zonas estratégicas.
+- Posibilidad de ampliar el sistema mediante comunicación con otros dispositivos IoT.
+- Adaptabilidad para futuras mejoras con nuevos sensores o algoritmos de detección.
+  
+***Temporales***
+- Desarrollo del prototipo en un plazo limitado, asegurando funcionalidad básica.
+- Posibilidad de mejoras futuras en algoritmos y hardware para mayor precisión.
 
-Sensores: Capturan datos de temperatura, gas y llama.
-Procesamiento (Arduino Uno): Analiza la información recibida de los sensores.
-Salida de Datos: Pantalla LCD para visualización, buzzer y LED para alertas.
-Energía: Fuente de 5V para alimentación del sistema.
-(Aquí se debe incluir el diagrama de bloques correspondiente.)
+### 2.2 Arquitectura Propuesta
+
+***Arquitectura IoT del Sistema***
+La arquitectura IoT del sistema de detección de incendios en los cerros orientales de Bogotá se basa en una estructura distribuida compuesta por sensores, procesamiento local y comunicación de datos para la notificación de alertas. Se organiza en tres capas principales:
+
+1. Capa de Percepción (Sensores y Adquisición de Datos)
+Es la capa encargada de capturar la información del entorno mediante sensores físicos. Los dispositivos utilizados incluyen:
+
+Sensor de temperatura (DHT11): Mide la temperatura del aire en la zona monitoreada.
+Sensor de gas (MQ-2): Detecta concentraciones de gases como CO y CO₂, indicativos de combustión.
+Sensor de llama (KY-026): Detecta la presencia de llamas en el área monitoreada.
+Los sensores están conectados a un Arduino Uno, que procesa la información en tiempo real.
+
+2. Capa de Procesamiento y Control
+El Arduino Uno actúa como la unidad central de procesamiento (CPU), encargada de:
+
+Leer y analizar los datos recibidos de los sensores.
+Determinar si las condiciones indican un posible incendio.
+Activar mecanismos de alerta local (buzzer, LED y pantalla LCD).
+Opcionalmente, el sistema puede incorporar conectividad remota mediante módulos de comunicación (Wi-Fi o GSM) en futuras versiones.
+
+3. Capa de Comunicación y Notificación
+En la versión básica del prototipo, las alertas se generan localmente mediante:
+
+Pantalla LCD: Muestra valores en tiempo real y advertencias.
+LEDs indicadores: Señalización visual de estados normales y de alerta.
+Buzzer: Alarma sonora para advertir de situaciones críticas.
+En una futura versión del sistema, se podría integrar una red IoT con conexión a Internet mediante Wi-Fi, GSM o LoRaWAN, permitiendo el envío de alertas a un servidor en la nube o directamente a las autoridades locales mediante API de mensajería o aplicaciones móviles.
+
+
+
 
 2.3 Desarrollo Teórico Modular
 Criterios de Diseño
@@ -80,30 +100,3 @@ Buenas prácticas de programación en Arduino (uso eficiente de memoria y proces
 Normas de comunicación de sensores para asegurar compatibilidad y precisión.
 
 
-2.2 Arquitectura Propuesta
-Arquitectura IoT del Sistema
-La arquitectura IoT del sistema de detección de incendios en los cerros orientales de Bogotá se basa en una estructura distribuida compuesta por sensores, procesamiento local y comunicación de datos para la notificación de alertas. Se organiza en tres capas principales:
-
-1. Capa de Percepción (Sensores y Adquisición de Datos)
-Es la capa encargada de capturar la información del entorno mediante sensores físicos. Los dispositivos utilizados incluyen:
-
-Sensor de temperatura (DHT11): Mide la temperatura del aire en la zona monitoreada.
-Sensor de gas (MQ-2): Detecta concentraciones de gases como CO y CO₂, indicativos de combustión.
-Sensor de llama (KY-026): Detecta la presencia de llamas en el área monitoreada.
-Los sensores están conectados a un Arduino Uno, que procesa la información en tiempo real.
-
-2. Capa de Procesamiento y Control
-El Arduino Uno actúa como la unidad central de procesamiento (CPU), encargada de:
-
-Leer y analizar los datos recibidos de los sensores.
-Determinar si las condiciones indican un posible incendio.
-Activar mecanismos de alerta local (buzzer, LED y pantalla LCD).
-Opcionalmente, el sistema puede incorporar conectividad remota mediante módulos de comunicación (Wi-Fi o GSM) en futuras versiones.
-
-3. Capa de Comunicación y Notificación
-En la versión básica del prototipo, las alertas se generan localmente mediante:
-
-Pantalla LCD: Muestra valores en tiempo real y advertencias.
-LEDs indicadores: Señalización visual de estados normales y de alerta.
-Buzzer: Alarma sonora para advertir de situaciones críticas.
-En una futura versión del sistema, se podría integrar una red IoT con conexión a Internet mediante Wi-Fi, GSM o LoRaWAN, permitiendo el envío de alertas a un servidor en la nube o directamente a las autoridades locales mediante API de mensajería o aplicaciones móviles.

@@ -51,27 +51,25 @@ La arquitectura IoT del sistema de detección de incendios en los cerros orienta
 1. Capa de Percepción (Sensores y Adquisición de Datos)
 Es la capa encargada de capturar la información del entorno mediante sensores físicos. Los dispositivos utilizados incluyen:
 
-Sensor de temperatura (DHT11): Mide la temperatura del aire en la zona monitoreada.
-Sensor de gas (MQ-2): Detecta concentraciones de gases como CO y CO₂, indicativos de combustión.
-Sensor de llama (KY-026): Detecta la presencia de llamas en el área monitoreada.
+- Sensor de temperatura (): Mide la temperatura del aire en la zona monitoreada.
+- Sensor de gas (): Detecta concentraciones de gases como CO y CO₂, indicativos de combustión.
+- Sensor de llama (): Detecta la presencia de llamas en el área monitoreada.
 Los sensores están conectados a un Arduino Uno, que procesa la información en tiempo real.
 
 2. Capa de Procesamiento y Control
 El Arduino Uno actúa como la unidad central de procesamiento (CPU), encargada de:
 
-Leer y analizar los datos recibidos de los sensores.
-Determinar si las condiciones indican un posible incendio.
-Activar mecanismos de alerta local (buzzer, LED y pantalla LCD).
-Opcionalmente, el sistema puede incorporar conectividad remota mediante módulos de comunicación (Wi-Fi o GSM) en futuras versiones.
+- Leer y analizar los datos recibidos de los sensores.
+- Determinar si las condiciones indican un posible incendio.
+- Activar mecanismos de alerta local (buzzer, LED y pantalla LCD).
 
 3. Capa de Comunicación y Notificación
 En la versión básica del prototipo, las alertas se generan localmente mediante:
 
-Pantalla LCD: Muestra valores en tiempo real y advertencias.
-LEDs indicadores: Señalización visual de estados normales y de alerta.
-Buzzer: Alarma sonora para advertir de situaciones críticas.
-En una futura versión del sistema, se podría integrar una red IoT con conexión a Internet mediante Wi-Fi, GSM o LoRaWAN, permitiendo el envío de alertas a un servidor en la nube o directamente a las autoridades locales mediante API de mensajería o aplicaciones móviles.
-
+- Pantalla LCD: Muestra valores en tiempo real y advertencias.
+- LEDs indicadores: Señalización visual de estados normales y de alerta.
+- Buzzer: Alarma sonora para advertir de situaciones críticas.
+![.](imagenesWiki/arqui.jpg)
 
 
 

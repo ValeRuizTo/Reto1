@@ -189,6 +189,7 @@ Los resultados muestran que el sistema es capaz de detectar condiciones de incen
 - Tiempo de respuesta del sensor de gas: En algunas pruebas, el MQ-2 tardó unos segundos en reaccionar a concentraciones bajas de gas y el sesnro de temperatura tardo tambien en detectar "altas" temperaturas
 - Interferencia en el sensor de llama: En presencia de objetos muy cercanos, el sensor de llama presentó algunas lecturas falsas.
 - Precisión del sensor de temperatura: Se recomienda utilizar una calibración adicional para mejorar la precisión en entornos con variaciones bruscas de temperatura. En general es muy importante calibrar el sensor igual que el de llama para que reconozcan los niveles que se necesitaron
+- 
   
 ## 4. Autoevaluación del Protocolo de Pruebas
 El protocolo de pruebas aplicado permitió validar el correcto funcionamiento del sistema, pero se identifican oportunidades de mejora:
@@ -204,7 +205,15 @@ Durante el desarrollo del proyecto, se enfrentaron varios desafíos, entre ellos
 - Limitaciones en la sensibilidad de los sensores: Algunos sensores requieren tiempos de calibración o ajustes de umbral.
 - Interferencias ambientales: Se detectaron lecturas erróneas en entornos con iluminación intensa o fluctuaciones de temperatura.
 - Integración de múltiples sensores: La sincronización de las lecturas para evitar falsos positivos requirió ajustes en el código.
+- Dificultad en la obtención e instalación de librerías: Para poder trabajar con el sensor DS18B20 y la pantalla LCD, fue necesario encontrar e instalar las librerías adecuadas. En particular, usamos las siguientes:
+  - OneWire.h: Para la comunicación con el sensor de temperatura DS18B20.
+  - DallasTemperature.h: Para procesar los datos del sensor DS18B20.
+  - Wire.h y LiquidCrystal_I2C.h: Para manejar la pantalla LCD con comunicación I2C.
 
+Encontrar las versiones correctas y lograr que funcionaran correctamente en el entorno de desarrollo tomó tiempo.
+- Conversión de temperatura: Inicialmente, no sabíamos si la temperatura obtenida del sensor DS18B20 estaba en grados Celsius o Fahrenheit. Implementar la fórmula de conversión fue un reto, ya que el sensor devuelve la temperatura en Celsius por defecto, pero hubo confusión con las configuraciones y ajustes previos. Se consideró la fórmula: T(°C)=(T(°F)-32)*5/9
+
+​Sin embargo, al final se confirmó que el sensor ya devolvía los valores en Celsius, lo que evitó conversiones adicionales.
 ### 5.2 Conclusiones
 Se logró diseñar un sistema funcional de detección de incendios basado en sensores de llama, gas y temperatura.
 Las pruebas experimentales confirmaron que el sistema puede detectar situaciones de riesgo y activar alertas visuales y sonoras.
@@ -218,4 +227,138 @@ Para mejorar la efectividad del sistema, se proponen las siguientes líneas de t
 - Mejora en la detección de fuego: Uso de sensores infrarrojos más avanzados para evitar falsas detecciones por iluminación externa.
 - Desarrollo de una interfaz gráfica: Creación de una aplicación para monitoreo remoto de los valores registrados.
 
+## 6. Anexos
+### Codigo Arduino comentado
+      
+      #include <Wire.h>
+      #include <LiquidCrystal_I2C.h>
+      #include <OneWire.h>
+      #include <DallasTemperature.h>
+      
+      // Definición de pines para los sensores y dispositivos de salida
+      #define DS18B20_PIN A0  // Pin del sensor de temperatura DS18B20
+      #define SENSOR_LLAMAS 7  // Pin digital del sensor de llama
+      
+      // Inicialización del LCD con dirección I2C 0x27 y tamaño 16x2
+      LiquidCrystal_I2C lcd(0x27, 16, 2);
+      
+      // Configuración del bus OneWire para el sensor de temperatura
+      OneWire oneWire(DS18B20_PIN);
+      DallasTemperature sensores(&oneWire);
+      
+      // Definición de pines adicionales para el sensor de gas y dispositivos de alerta
+      const int sensor_gas = A1;
+      int rojo = 9;   // LED rojo para alerta
+      int verde = 8;  // LED verde para estado seguro
+      int bocina = 2; // Bocina de alarma
+      
+      // Variables para el control de temperatura y tiempo de actualización del LCD
+      float ultima_temperatura = 0;
+      unsigned long tiempoAnterior = 0;
+      const long intervaloActualizacion = 500; // Actualización cada 500 ms
+      
+      void setup() {
+        Serial.begin(9600); // Inicia la comunicación serie
+        lcd.init();         // Inicializa el LCD
+        lcd.backlight();    // Enciende la retroiluminación del LCD
+      
+        // Configuración de pines de salida
+        pinMode(rojo, OUTPUT);
+        pinMode(verde, OUTPUT);
+        pinMode(bocina, OUTPUT);
+        pinMode(SENSOR_LLAMAS, INPUT); // Sensor de llama como entrada
+      
+        sensores.begin(); // Inicia el sensor DS18B20
+      }
+      
+      void loop() {
+        unsigned long tiempoActual = millis(); // Obtiene el tiempo actual del sistema
+      
+        // Solicita la temperatura al sensor DS18B20
+        sensores.requestTemperatures();  
+        float temperatura = sensores.getTempCByIndex(0); // Obtiene la temperatura en grados Celsius
+      
+        // Lee los valores de los sensores de gas y llama
+        int lectura_gas = analogRead(sensor_gas);
+        int estado_llama = digitalRead(SENSOR_LLAMAS); // LOW indica fuego detectado
+      
+        Serial.print("Llama (digital): ");
+        Serial.println(estado_llama);
+      
+        // Determina si hay un incremento brusco de temperatura (mayor a 3°C respecto a la última lectura)
+        bool incremento_brusco = abs(temperatura - ultima_temperatura) > 3;
+      
+        //  Si detecta fuego (estado_llama == 0), activa la alarma
+        if (estado_llama == LOW) { 
+          Serial.println("¡ALERTA! FUEGO DETECTADO");
+          digitalWrite(rojo, HIGH);
+          digitalWrite(verde, LOW);
+          digitalWrite(bocina, HIGH);
+        } else {
+          digitalWrite(rojo, LOW);
+          digitalWrite(bocina, LOW);
+        }
+      
+        // Si han pasado 500 ms, se actualiza la pantalla LCD
+        if (tiempoActual - tiempoAnterior >= intervaloActualizacion) {
+          tiempoAnterior = tiempoActual; // Se actualiza el tiempo de referencia
+          lcd.clear(); // Se limpia la pantalla para mostrar nuevos datos
+      
+          if (incremento_brusco || estado_llama == LOW) { // Si hay fuego o cambio brusco de temperatura
+            lcd.setCursor(0, 0);
+            lcd.print("ALERTA: FUEGO");
+      
+            lcd.setCursor(0, 1);
+            lcd.print("Gas: ");
+            lcd.print(lectura_gas);
+            digitalWrite(rojo, HIGH);
+            digitalWrite(verde, LOW);
+            digitalWrite(bocina, HIGH);
+          } 
+          else {
+            // Muestra la temperatura y el nivel de gas en el LCD
+            lcd.setCursor(0, 0);
+            lcd.print("Temp: ");
+            lcd.print(temperatura);
+            lcd.print("C");
+      
+            lcd.setCursor(0, 1);
+            lcd.print("Gas: ");
+            lcd.print(lectura_gas);
+      
+            // Si el nivel de gas supera 400, enciende alerta, de lo contrario, luz verde
+            if (lectura_gas > 400) {
+              digitalWrite(rojo, HIGH);
+              digitalWrite(verde, LOW);
+            } else {
+              digitalWrite(rojo, LOW);
+              digitalWrite(verde, HIGH);
+            }
+      
+            // Activa la bocina si la temperatura es mayor a 15°C y el gas es alto (>400)
+            digitalWrite(bocina, (temperatura > 15 && lectura_gas > 400) ? HIGH : LOW);
+          }
+        }
+      
+        // Guarda la temperatura actual para la próxima comparación
+        ultima_temperatura = temperatura;
+      
+        delay(200); // Pequeña pausa antes de la próxima iteración
+      }
 
+### Implementacion Fisica
+![.](imagenesWiki/img1.jpg)
+
+En la imagen se puede observar el cableado físico del proyecto, incluyendo la protoboard y el Arduino. También se aprecia la conexión de los sensores, mostrando cómo están integrados en el sistema.
+
+![.](imagenesWiki/img2.jpg)
+
+En esta imagen se puede observar que tanto el nivel de gas como la temperatura han superado los límites establecidos. Como consecuencia, el LED indicador se ilumina en rojo y la alarma se activa, alertando sobre una posible situación de riesgo.
+
+![.](imagenesWiki/img3.jpg)
+
+En esta imagen se puede observar que el nivel de gas se encuentra dentro de los límites seguros, es decir, por debajo del umbral de 400. Como resultado, la alarma no se activa y el LED indicador permanece en color verde, señalando un estado normal y sin riesgos
+
+![.](imagenesWiki/img4.jpg)
+
+En la imagen se muestra la prueba del sensor de llama, donde al acercar un encendedor encendido, el sistema detecta la presencia de fuego. Como resultado, se activa una alarma y en la pantalla LCD aparece el mensaje "ALERTA: FUEGO"

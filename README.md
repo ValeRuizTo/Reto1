@@ -46,6 +46,7 @@ Este documento se divide en las siguientes secciones:
 ### 2.2 Arquitectura Propuesta
 
 ***Arquitectura IoT del Sistema***
+
 La arquitectura IoT del sistema de detección de incendios en los cerros orientales de Bogotá se basa en una estructura distribuida compuesta por sensores, procesamiento local y comunicación de datos para la notificación de alertas. Se organiza en tres capas principales:
 
 1. Capa de Percepción (Sensores y Adquisición de Datos)
@@ -73,38 +74,73 @@ En la versión básica del prototipo, las alertas se generan localmente mediante
 
 
 
-2.3 Desarrollo Teórico Modular
-Criterios de Diseño
-Fiabilidad: Uso de sensores calibrados para evitar falsas alarmas.
-Bajo Consumo Energético: Optimización del código para minimizar consumo.
-Interfaz Intuitiva: Uso de LCD y alertas sonoras para notificaciones claras.
-Escalabilidad: Posibilidad de agregar conectividad remota en versiones futuras.
-Diagramas UML de la Solución y Módulos de Software
+### 2.3 Desarrollo Teórico Modular
+- Fiabilidad: Uso de sensores calibrados para evitar falsas alarmas.
+- Bajo Consumo Energético: Optimización del código para minimizar consumo.
+- Interfaz Intuitiva: Uso de LCD y alertas sonoras para notificaciones claras.
+- Escalabilidad: Posibilidad de agregar conectividad remota en versiones futuras.
+
+***Diagramas UML de la Solución y Módulos de Software*** 
+
 Se incluyen los diagramas UML para representar la lógica del software desarrollado, incluyendo:
 
-Diagrama de Clases: Estructura del código y relación entre módulos.
+**Diagrama de Clases:** Estructura del código y relación entre módulos.
 
 
-Diagrama de Secuencia: Flujo de datos entre sensores, Arduino y salidas.
+**Diagrama de Secuencia:** Flujo de datos entre sensores, Arduino y salidas.
                   
-                  Usuario          SistemaIoT        SensorTemp      SensorGas       SensorLlama       LCD        Alarma
-                    |                  |                  |               |                |            |           |
-                    |----setup()-----> |                  |               |                |            |           |
-                    |                  |----requestTemp()->|               |                |            |           |
-                    |                  |<---(temp)---------|               |                |            |           |
-                    |                  |----readGasLevel()->|--------------|                |            |           |
-                    |                  |<---(gas)-----------|              |                |            |           |
-                    |                  |----detectarFuego()->|-------------|                |            |           |
-                    |                  |<---(fuego)----------|             |                |            |           |
-                    |                  |----updateLCD()------------------------------------->|            |           |
-                    |                  |----activarAlarma()------------------------------------------------>|
-                    |                  |----desactivarAlarma()--------------------------------------------->|
+      Usuario          SistemaIoT        SensorTemp      SensorGas       SensorLlama       LCD        Alarma
+        |                  |                  |               |                |            |           |
+        |----setup()-----> |                  |               |                |            |           |
+        |                  |----requestTemp()->|               |                |            |           |
+        |                  |<---(temp)---------|               |                |            |           |
+        |                  |----readGasLevel()->|--------------|                |            |           |
+        |                  |<---(gas)-----------|              |                |            |           |
+        |                  |----detectarFuego()->|-------------|                |            |           |
+        |                  |<---(fuego)----------|             |                |            |           |
+        |                  |----updateLCD()------------------------------------->|            |           |
+        |                  |----activarAlarma()------------------------------------------------>|
+        |                  |----desactivarAlarma()--------------------------------------------->|
 
 
 
 
 Diagrama de Estados: Estados del sistema según las condiciones detectadas.
-(Aquí se deben agregar los diagramas UML correspondientes.)
+
+Estado: Inicio
+    - Inicializa sensores y componentes
+    - Transición a → Monitoreo Normal
+
+Estado: Monitoreo Normal
+    - Lee sensores de temperatura, gas y llama
+    - Muestra valores en LCD
+    - Si `lectura_gas > 400` → Transición a Detección de Gas Alto
+    - Si `estado_llama == LOW` → Transición a Detección de Llama
+    - Si `abs(temperatura - ultima_temperatura) > 3` → Transición a Incremento Brusco de Temperatura
+
+Estado: Detección de Gas Alto
+    - Activa LED rojo
+    - Si `lectura_gas > 400 && temperatura > 30` → Transición a Alarma Activada
+    - Si `lectura_gas <= 400` → Transición a Monitoreo Normal
+
+Estado: Detección de Llama
+    - Activa LED rojo y bocina
+    - Transición a Alarma Activada
+
+Estado: Incremento Brusco de Temperatura
+    - Si `abs(temperatura - ultima_temperatura) > 3`
+    - Activa LED rojo y bocina
+    - Transición a Alarma Activada
+
+Estado: Alarma Activada
+    - Activa LED rojo y bocina
+    - Muestra alerta en LCD
+    - Si `estado_llama == HIGH && lectura_gas <= 400 && temperatura estable` → Transición a Alarma Desactivada
+
+Estado: Alarma Desactivada
+    - Apaga LED rojo y bocina
+    - Transición a Monitoreo Normal
+
 
 Esquemático de Hardware
 El diseño del hardware incluye la interconexión entre los sensores, el Arduino Uno, la pantalla LCD, el buzzer y los LEDs.

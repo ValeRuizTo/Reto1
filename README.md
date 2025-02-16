@@ -106,52 +106,116 @@ Se incluyen los diagramas UML para representar la lógica del software desarroll
 
 
 
-Diagrama de Estados: Estados del sistema según las condiciones detectadas.
+**Diagrama de Estados:** Estados del sistema según las condiciones detectadas.
 
-Estado: Inicio
-    - Inicializa sensores y componentes
-    - Transición a → Monitoreo Normal
+*Estado: Inicio*
+  - Inicializa sensores y componentes
+  - Transición a → Monitoreo Normal
 
-Estado: Monitoreo Normal
-    - Lee sensores de temperatura, gas y llama
-    - Muestra valores en LCD
-    - Si `lectura_gas > 400` → Transición a Detección de Gas Alto
-    - Si `estado_llama == LOW` → Transición a Detección de Llama
-    - Si `abs(temperatura - ultima_temperatura) > 3` → Transición a Incremento Brusco de Temperatura
+*Estado: Monitoreo Normal*
+  - Lee sensores de temperatura, gas y llama
+  - Muestra valores en LCD
+  - Si `lectura_gas > 400` → Transición a Detección de Gas Alto
+  - Si `estado_llama == LOW` → Transición a Detección de Llama
+  - Si `abs(temperatura - ultima_temperatura) > 3` → Transición a Incremento Brusco de Temperatura
 
-Estado: Detección de Gas Alto
-    - Activa LED rojo
-    - Si `lectura_gas > 400 && temperatura > 30` → Transición a Alarma Activada
-    - Si `lectura_gas <= 400` → Transición a Monitoreo Normal
+*Estado: Detección de Gas Alto*
+  - Activa LED rojo
+  - Si `lectura_gas > 400 && temperatura > 15` → Transición a Alarma Activada
+  - Si `lectura_gas <= 400` → Transición a Monitoreo Normal
 
-Estado: Detección de Llama
-    - Activa LED rojo y bocina
-    - Transición a Alarma Activada
+*Estado: Detección de Llama*
+  - Activa LED rojo y bocina
+  - Transición a Alarma Activada
 
-Estado: Incremento Brusco de Temperatura
-    - Si `abs(temperatura - ultima_temperatura) > 3`
-    - Activa LED rojo y bocina
-    - Transición a Alarma Activada
+*Estado: Incremento Brusco de Temperatura*
+  - Si `abs(temperatura - ultima_temperatura) > 3`
+  - Activa LED rojo y bocina
+  - Transición a Alarma Activada
 
-Estado: Alarma Activada
-    - Activa LED rojo y bocina
-    - Muestra alerta en LCD
-    - Si `estado_llama == HIGH && lectura_gas <= 400 && temperatura estable` → Transición a Alarma Desactivada
+*Estado: Alarma Activada*
+  - Activa LED rojo y bocina
+  - Muestra alerta en LCD
+  - Si `estado_llama == HIGH && lectura_gas <= 400 && temperatura estable` → Transición a Alarma Desactivada
 
-Estado: Alarma Desactivada
-    - Apaga LED rojo y bocina
-    - Transición a Monitoreo Normal
+*Estado: Alarma Desactivada*
+  - Apaga LED rojo y bocina
+  - Transición a Monitoreo Normal
 
 
-Esquemático de Hardware
+**Esquemático de Hardware**
 El diseño del hardware incluye la interconexión entre los sensores, el Arduino Uno, la pantalla LCD, el buzzer y los LEDs.
 
 ![.](imagenesWiki/thinkercad.jpg)
 
 
-Estándares de Diseño Aplicados
+**Estándares de Diseño Aplicados**
 Normas de seguridad electrónica para evitar riesgos eléctricos.
 Buenas prácticas de programación en Arduino (uso eficiente de memoria y procesamiento).
 Normas de comunicación de sensores para asegurar compatibilidad y precisión.
+
+## 3. Configuración Experimental, Resultados y Análisis
+### 3.1 Configuración Experimental
+Para evaluar el funcionamiento del sistema de detección de incendios, se diseñaron pruebas en condiciones controladas que simulan distintos escenarios de emergencia. Se realizaron experimentos variando la presencia de calor, gases y llamas para validar la respuesta del sistema.
+
+**Entorno de prueba:** Espacio cerrado con ventilación controlada/ laboratorio con la ventana abierta.
+
+**Variables medidas:** Temperatura (°C), concentración de gas (valor analógico) y detección de llama (binario).
+
+***Procedimiento:***
+- Prueba de detección de llama: Se utilizó una fuente de fuego controlada para activar el sensor de llama, un encendedor.
+- Prueba de detección de gas: Se expuso el sensor MQ-2 a diferentes situaciones:
+  - Tapar el sensor con la mano: Puede causar un aumento temporal en la lectura porque se acumulan pequeñas cantidades de gas o humedad.
+  - Solpar sobre el sensor, el MQ-2 puede reaccionar al CO₂ de la respiración, es decir si se sopla con la boca el CO₂ y la humedad pueden alterar la lectura.
+  - Acercar un encendedor sin encenderlo: Los sensores MQ-2 pueden detectar el gas butano del encendedor, es decir debería aumentar la lectura de gas y activar la alarma si está bien calibrado.
+- Prueba de temperatura: Se aumentó la temperatura gradualmente con una fuente de calor.
+- Evaluación del LCD y alerta sonora: Se verificó la correcta visualización de datos y activación del buzzer ante condiciones de riesgo.
+  
+### 3.2 Resultados Obtenidos
+Los resultados obtenidos en las pruebas de detección fueron satisfactorios en la mayoría de los casos.
+
+## Pruebas del Sistema IoT de Detección de Incendios
+
+| **Prueba**                  | **Condición Simulada**                 | **Respuesta Esperada**                              | **Respuesta Observada** |
+|-----------------------------|----------------------------------------|----------------------------------------------------|-------------------------|
+| **Detección de llama**       | Encendido de una llama cercana        | Activación de buzzer y alerta en LCD              | ✅ Correcto              |
+| **Detección de gas**         | Exposición a gas (tapando el sesnor, soplando y con el encendedor sin prender)           | Cambio de LED verde a rojo                        | ✅ Correcto              |
+| **Aumento de temperatura**   | Temperatura > 15°C                    | Activación de alerta en LCD y buzzer              | ✅ Correcto              |
+| **Combinación de factores**  | Temperatura alta + gas + llama        | Activación total de alarmas                       | ✅ Correcto              |
+
+### 3.3 Análisis de los Resultados
+Los resultados muestran que el sistema es capaz de detectar condiciones de incendio de manera efectiva. Sin embargo, se identificaron algunos aspectos de mejora:
+
+- Tiempo de respuesta del sensor de gas: En algunas pruebas, el MQ-2 tardó unos segundos en reaccionar a concentraciones bajas de gas y el sesnro de temperatura tardo tambien en detectar "altas" temperaturas
+- Interferencia en el sensor de llama: En presencia de objetos muy cercanos, el sensor de llama presentó algunas lecturas falsas.
+- Precisión del sensor de temperatura: Se recomienda utilizar una calibración adicional para mejorar la precisión en entornos con variaciones bruscas de temperatura. En general es muy importante calibrar el sensor igual que el de llama para que reconozcan los niveles que se necesitaron
+  
+## 4. Autoevaluación del Protocolo de Pruebas
+El protocolo de pruebas aplicado permitió validar el correcto funcionamiento del sistema, pero se identifican oportunidades de mejora:
+
+- Fortalecer la calibración de sensores: Ajustar umbrales para mejorar la sensibilidad en condiciones de baja detección.
+- Incluir pruebas en exteriores: Evaluar el rendimiento en condiciones ambientales reales, considerando factores como viento y humedad.
+- Medición del consumo energético: Para determinar la viabilidad de una alimentación con batería en entornos remotos.
+
+## 5. Conclusiones y Trabajo Futuro
+### 5.1 Retos Presentados Durante el Desarrollo
+Durante el desarrollo del proyecto, se enfrentaron varios desafíos, entre ellos:
+
+- Limitaciones en la sensibilidad de los sensores: Algunos sensores requieren tiempos de calibración o ajustes de umbral.
+- Interferencias ambientales: Se detectaron lecturas erróneas en entornos con iluminación intensa o fluctuaciones de temperatura.
+- Integración de múltiples sensores: La sincronización de las lecturas para evitar falsos positivos requirió ajustes en el código.
+
+### 5.2 Conclusiones
+Se logró diseñar un sistema funcional de detección de incendios basado en sensores de llama, gas y temperatura.
+Las pruebas experimentales confirmaron que el sistema puede detectar situaciones de riesgo y activar alertas visuales y sonoras.
+Se identificaron oportunidades de mejora para aumentar la precisión y confiabilidad del sistema en condiciones reales.
+
+### 5.3 Trabajo Futuro
+Para mejorar la efectividad del sistema, se proponen las siguientes líneas de trabajo:
+
+- Incorporación de conectividad IoT: Uso de módulos WiFi o LoRa para enviar alertas a las autoridades en tiempo real.
+- Optimización de la alimentación energética: Implementación de baterías recargables o paneles solares para autonomía en campo.
+- Mejora en la detección de fuego: Uso de sensores infrarrojos más avanzados para evitar falsas detecciones por iluminación externa.
+- Desarrollo de una interfaz gráfica: Creación de una aplicación para monitoreo remoto de los valores registrados.
 
 

@@ -85,6 +85,7 @@ En la versión básica del prototipo, las alertas se generan localmente mediante
 Se incluyen los diagramas UML para representar la lógica del software desarrollado, incluyendo:
 
 **Diagrama de Clases:** Estructura del código y relación entre módulos.
+![.](imagenesWiki/uml.jpg)
 
 
 **Diagrama de Secuencia:** Flujo de datos entre sensores, Arduino y salidas.
@@ -145,7 +146,8 @@ Estado: Alarma Desactivada
 Esquemático de Hardware
 El diseño del hardware incluye la interconexión entre los sensores, el Arduino Uno, la pantalla LCD, el buzzer y los LEDs.
 
-(Aquí se debe incluir el esquemático del circuito.)
+![.](imagenesWiki/thinkercad.jpg)
+
 
 Estándares de Diseño Aplicados
 Normas de seguridad electrónica para evitar riesgos eléctricos.

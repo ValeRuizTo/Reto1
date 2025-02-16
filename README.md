@@ -83,7 +83,26 @@ Diagramas UML de la Solución y Módulos de Software
 Se incluyen los diagramas UML para representar la lógica del software desarrollado, incluyendo:
 
 Diagrama de Clases: Estructura del código y relación entre módulos.
+
+
 Diagrama de Secuencia: Flujo de datos entre sensores, Arduino y salidas.
+                  
+                  Usuario          SistemaIoT        SensorTemp      SensorGas       SensorLlama       LCD        Alarma
+                    |                  |                  |               |                |            |           |
+                    |----setup()-----> |                  |               |                |            |           |
+                    |                  |----requestTemp()->|               |                |            |           |
+                    |                  |<---(temp)---------|               |                |            |           |
+                    |                  |----readGasLevel()->|--------------|                |            |           |
+                    |                  |<---(gas)-----------|              |                |            |           |
+                    |                  |----detectarFuego()->|-------------|                |            |           |
+                    |                  |<---(fuego)----------|             |                |            |           |
+                    |                  |----updateLCD()------------------------------------->|            |           |
+                    |                  |----activarAlarma()------------------------------------------------>|
+                    |                  |----desactivarAlarma()--------------------------------------------->|
+
+
+
+
 Diagrama de Estados: Estados del sistema según las condiciones detectadas.
 (Aquí se deben agregar los diagramas UML correspondientes.)
 

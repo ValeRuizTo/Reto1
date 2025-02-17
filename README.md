@@ -363,7 +363,7 @@ En esta imagen se puede observar que tanto el nivel de gas como la temperatura h
 
 En esta imagen se puede observar que tanto el nivel de gas como el de temperatura se encuentran dentro de los límites seguros, es decir, por debajo del umbral de 400 y de 30°C. Como resultado, la alarma no se activa y el LED indicador permanece en color verde, señalando un estado normal y sin riesgos
 
-![.](imagenesWiki/img4.jpg)
+![.](imagenesWiki/img8.jpg)
 
 En la imagen se muestra la prueba del sensor de llama, donde al acercar un encendedor encendido, el sistema detecta la presencia de fuego. Como resultado, se activa una alarma y en la pantalla LCD aparece el mensaje "ALERTA: FUEGO"
 

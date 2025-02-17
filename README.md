@@ -359,9 +359,9 @@ En la imagen se puede observar el cableado físico del proyecto, incluyendo la p
 
 En esta imagen se puede observar que tanto el nivel de gas como la temperatura han superado los límites establecidos. Como consecuencia, el LED indicador se ilumina en rojo y la alarma se activa, alertando sobre una posible situación de riesgo.
 
-![.](imagenesWiki/img3.jpg)
+![.](imagenesWiki/img7.jpg)
 
-En esta imagen se puede observar que el nivel de gas se encuentra dentro de los límites seguros, es decir, por debajo del umbral de 400. Como resultado, la alarma no se activa y el LED indicador permanece en color verde, señalando un estado normal y sin riesgos
+En esta imagen se puede observar que tanto el nivel de gas como el de temperatura se encuentran dentro de los límites seguros, es decir, por debajo del umbral de 400 y de 30°C. Como resultado, la alarma no se activa y el LED indicador permanece en color verde, señalando un estado normal y sin riesgos
 
 ![.](imagenesWiki/img4.jpg)
 

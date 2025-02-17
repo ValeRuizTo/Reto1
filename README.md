@@ -94,21 +94,21 @@ Se incluyen los diagramas UML para representar la lógica del software desarroll
 
 **Diagrama de Secuencia:** Flujo de datos entre sensores, Arduino y salidas.
                   
-   Usuario          SistemaIoT        SensorTemp      SensorGas       SensorLlama       LCD        Alarma
-      |                  |                  |               |                |            |           |
-      |----setup()-----> |                  |               |                |            |           |
-      |                  |----requestTemp()->|               |                |            |           |
-      |                  |<---(temp)---------|               |                |            |           |
-      |                  |----readGasLevel()->|--------------|                |            |           |
-      |                  |<---(gas)-----------|              |                |            |           |
-      |                  |----detectarFuego()->|-------------|                |            |           |
-      |                  |<---(fuego)----------|             |                |            |           |
-      |                  |----verificarCondiciones()-------->|                |            |           |
-      |                  |                                  |                |            |           |
-      |                  |----updateLCD()------------------------------------->|            |           |
-      |                  |----activarAlarma()------------------------------------------------>|
-      |                  |----desactivarAlarma()--------------------------------------------->|
-
+     Usuario          SistemaIoT        SensorTemp      SensorGas       SensorLlama       LCD        Alarma
+        |                  |                  |               |                |            |           |
+        |----setup()-----> |                  |               |                |            |           |
+        |                  |----requestTemp()->|               |                |            |           |
+        |                  |<---(temp)---------|               |                |            |           |
+        |                  |----readGasLevel()->|--------------|                |            |           |
+        |                  |<---(gas)-----------|              |                |            |           |
+        |                  |----detectarFuego()->|-------------|                |            |           |
+        |                  |<---(fuego)----------|             |                |            |           |
+        |                  |----verificarCondiciones()-------->|                |            |           |
+        |                  |                                  |                |            |           |
+        |                  |----updateLCD()------------------------------------->|            |           |
+        |                  |----activarAlarma()------------------------------------------------>|
+        |                  |----desactivarAlarma()--------------------------------------------->|
+  
 
 
 

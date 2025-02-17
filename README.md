@@ -234,107 +234,114 @@ Para mejorar la efectividad del sistema, se proponen las siguientes líneas de t
 ## 6. Anexos
 ### Codigo Arduino comentado
             
-      #include <Wire.h>
-      #include <LiquidCrystal_I2C.h>
-      #include <OneWire.h>
-      #include <DallasTemperature.h>
-      
-      #define DS18B20_PIN A0  // Pin del sensor DS18B20
-      #define SENSOR_LLAMAS 7  // Pin digital del sensor de llama
-      
-      LiquidCrystal_I2C lcd(0x27, 16, 2);
-      OneWire oneWire(DS18B20_PIN);
-      DallasTemperature sensores(&oneWire);
-      
-      const int sensor_gas = A1;
-      int rojo = 9;
-      int verde = 8;
-      int bocina = 2;
-      
-      float ultima_temperatura = 0;
-      unsigned long tiempoAnterior = 0;
-      const long intervaloActualizacion = 500; // 500 ms para refrescar LCD
-      
-      void setup() {
-        Serial.begin(9600);
-        lcd.init();
-        lcd.backlight();
-      
-        pinMode(rojo, OUTPUT);
-        pinMode(verde, OUTPUT);
-        pinMode(bocina, OUTPUT);
-        pinMode(SENSOR_LLAMAS, INPUT);
-      
-        sensores.begin(); // Iniciar sensor DS18B20
+    #include <Wire.h>  // Librería para comunicación I2C
+    #include <LiquidCrystal_I2C.h>  // Librería para pantalla LCD I2C
+    #include <OneWire.h>  // Librería para comunicación con sensores OneWire
+    #include <DallasTemperature.h>  // Librería para el sensor de temperatura DS18B20
+    
+    // Definición de pines
+    #define DS18B20_PIN A0  // Pin analógico donde está conectado el sensor DS18B20
+    #define SENSOR_LLAMAS 7  // Pin digital donde está conectado el sensor de llama
+    
+    // Inicialización de la pantalla LCD
+    LiquidCrystal_I2C lcd(0x27, 16, 2);  // Dirección 0x27, pantalla de 16x2
+    OneWire oneWire(DS18B20_PIN);  // Configuración del protocolo OneWire para el sensor de temperatura
+    DallasTemperature sensores(&oneWire);  // Creación del objeto para manejar el sensor de temperatura
+    
+    // Definición de pines adicionales
+    const int sensor_gas = A1;  // Pin analógico donde está conectado el sensor de gas
+    int rojo = 9;  // LED rojo para alerta
+    int verde = 8;  // LED verde para estado normal
+    int bocina = 2;  // Buzzer para alarma
+    
+    // Variables de control
+    double ultima_temperatura = 0;  // Última temperatura registrada
+    unsigned long tiempoAnterior = 0;  // Tiempo de la última actualización de la pantalla LCD
+    const long intervaloActualizacion = 500;  // Intervalo de actualización de la pantalla (500 ms)
+    
+    void setup() {
+      Serial.begin(9600);  // Iniciar comunicación serial
+      lcd.init();  // Iniciar la pantalla LCD
+      lcd.backlight();  // Encender la luz de fondo de la pantalla LCD
+    
+      // Configuración de pines de salida
+      pinMode(rojo, OUTPUT);
+      pinMode(verde, OUTPUT);
+      pinMode(bocina, OUTPUT);
+      pinMode(SENSOR_LLAMAS, INPUT);  // Configurar el sensor de llama como entrada
+    
+      sensores.begin();  // Iniciar el sensor DS18B20
+    }
+    
+    void loop() {
+      unsigned long tiempoActual = millis();  // Obtener el tiempo actual
+    
+      sensores.requestTemperatures();  // Solicitar temperatura al sensor
+      float temperatura = sensores.getTempCByIndex(0);  // Obtener temperatura en grados Celsius
+    
+      int lectura_gas = analogRead(sensor_gas);  // Leer el valor del sensor de gas
+      int estado_llama = digitalRead(SENSOR_LLAMAS);  // Leer el estado del sensor de llama
+    
+      Serial.print("Llama (digital): ");
+      Serial.println(estado_llama);
+    
+      // Detectar cambios bruscos de temperatura
+      bool incremento_brusco = abs(temperatura - ultima_temperatura) > 5;
+    
+      // 🔥 Si detecta fuego (estado_llama == 0), activar alarma
+      if (estado_llama == LOW) {  // LOW significa que detecta fuego
+        Serial.println("¡ALERTA! FUEGO DETECTADO");
+        digitalWrite(rojo, HIGH);  // Encender LED rojo
+        digitalWrite(verde, LOW);  // Apagar LED verde
+        digitalWrite(bocina, HIGH);  // Activar buzzer
+      } else {
+        digitalWrite(rojo, LOW);  // Apagar LED rojo
+        digitalWrite(bocina, LOW);  // Apagar buzzer
       }
-      
-      void loop() {
-        unsigned long tiempoActual = millis();
-      
-        sensores.requestTemperatures();  
-        float temperatura = sensores.getTempCByIndex(0);  // Obtener temperatura en Celsius
-      
-        int lectura_gas = analogRead(sensor_gas);
-        int estado_llama = digitalRead(SENSOR_LLAMAS); // Leer el sensor de llama como un botón
-      
-        Serial.print("Llama (digital): ");
-        Serial.println(estado_llama);
-      
-        bool incremento_brusco = abs(temperatura - ultima_temperatura) > 5;
-      
-        // 🔥 Si detecta fuego (estado_llama == 0), activar alarma
-        if (estado_llama == LOW) { // LOW significa que detecta fuego
-          Serial.println("¡ALERTA! FUEGO DETECTADO");
-          digitalWrite(rojo, HIGH);
-          digitalWrite(verde, LOW);
-          digitalWrite(bocina, HIGH);
-        } else {
-          digitalWrite(rojo, LOW);
-          digitalWrite(bocina, LOW);
-        }
-      
-        // Si ha pasado 500 ms, actualizar la pantalla LCD
-        if (tiempoActual - tiempoAnterior >= intervaloActualizacion) {
-          tiempoAnterior = tiempoActual;
-          lcd.clear();
-      
-          if (incremento_brusco || estado_llama == LOW || (temperatura > 30 && lectura_gas > 400)) { 
-            // 🔥 Mostrar alerta si hay fuego, incremento brusco o alta temperatura con gas elevado
-            lcd.setCursor(0, 0);
-            lcd.print("ALERTA: FUEGO");
-      
-            lcd.setCursor(0, 1);
-            lcd.print("Gas: ");
-            lcd.print(lectura_gas);
-            digitalWrite(rojo, HIGH);
+    
+      // Si ha pasado el intervalo de actualización, refrescar la pantalla LCD
+      if (tiempoActual - tiempoAnterior >= intervaloActualizacion) {
+        tiempoAnterior = tiempoActual;  // Actualizar el tiempo anterior
+        lcd.clear();  // Limpiar pantalla LCD
+    
+        // Condición de alerta: fuego, cambio brusco de temperatura o gas alto con temperatura elevada
+        if (incremento_brusco || estado_llama == LOW || (temperatura > 30 && lectura_gas > 400)) { 
+          lcd.setCursor(0, 0);
+          lcd.print("ALERTA: FUEGO");  // Mostrar alerta en pantalla LCD
+          lcd.setCursor(0, 1);
+          lcd.print("Gas: ");
+          lcd.print(lectura_gas);
+          digitalWrite(rojo, HIGH);  // Encender LED rojo
+          digitalWrite(verde, LOW);  // Apagar LED verde
+          digitalWrite(bocina, HIGH);  // Activar buzzer
+        } 
+        else {
+          lcd.setCursor(0, 0);
+          lcd.print("Temp: ");
+          lcd.print(temperatura);
+          lcd.print("C");  // Mostrar temperatura en la pantalla LCD
+    
+          lcd.setCursor(0, 1);
+          lcd.print("Gas: ");
+          lcd.print(lectura_gas);  // Mostrar nivel de gas en la pantalla LCD
+    
+          // Indicar si los valores son seguros o peligrosos
+          if (lectura_gas > 400 || temperatura > 30) {
+            digitalWrite(rojo, HIGH);  // Encender LED rojo si hay riesgo
             digitalWrite(verde, LOW);
-            digitalWrite(bocina, HIGH);
-          } 
-          else {
-            lcd.setCursor(0, 0);
-            lcd.print("Temp: ");
-            lcd.print(temperatura);
-            lcd.print("C");
-      
-            lcd.setCursor(0, 1);
-            lcd.print("Gas: ");
-            lcd.print(lectura_gas);
-      
-            if (lectura_gas > 400 || temperatura > 30) {
-              digitalWrite(rojo, HIGH);
-              digitalWrite(verde, LOW);
-            } else {
-              digitalWrite(rojo, LOW);
-              digitalWrite(verde, HIGH);
-            }
-            
-            digitalWrite(bocina, (temperatura > 30 && lectura_gas > 400) ? HIGH : LOW);
+          } else {
+            digitalWrite(rojo, LOW);
+            digitalWrite(verde, HIGH);  // Encender LED verde si todo está normal
           }
+          
+          digitalWrite(bocina, (temperatura > 30 && lectura_gas > 400) ? HIGH : LOW);  // Activar buzzer si hay alerta
         }
-      
-        ultima_temperatura = temperatura;
-        delay(200);
       }
+    
+      ultima_temperatura = temperatura;  // Guardar la última temperatura registrada
+      delay(200);  // Pequeña pausa antes de la siguiente iteración
+    }
+
 
 ### Implementacion Fisica
 ![.](imagenesWiki/img1.jpg)

@@ -233,67 +233,57 @@ Para mejorar la efectividad del sistema, se proponen las siguientes líneas de t
 
 ## 6. Anexos
 ### Codigo Arduino comentado
-      
+            
       #include <Wire.h>
       #include <LiquidCrystal_I2C.h>
       #include <OneWire.h>
       #include <DallasTemperature.h>
       
-      // Definición de pines para los sensores y dispositivos de salida
-      #define DS18B20_PIN A0  // Pin del sensor de temperatura DS18B20
+      #define DS18B20_PIN A0  // Pin del sensor DS18B20
       #define SENSOR_LLAMAS 7  // Pin digital del sensor de llama
       
-      // Inicialización del LCD con dirección I2C 0x27 y tamaño 16x2
       LiquidCrystal_I2C lcd(0x27, 16, 2);
-      
-      // Configuración del bus OneWire para el sensor de temperatura
       OneWire oneWire(DS18B20_PIN);
       DallasTemperature sensores(&oneWire);
       
-      // Definición de pines adicionales para el sensor de gas y dispositivos de alerta
       const int sensor_gas = A1;
-      int rojo = 9;   // LED rojo para alerta
-      int verde = 8;  // LED verde para estado seguro
-      int bocina = 2; // Bocina de alarma
+      int rojo = 9;
+      int verde = 8;
+      int bocina = 2;
       
-      // Variables para el control de temperatura y tiempo de actualización del LCD
       float ultima_temperatura = 0;
       unsigned long tiempoAnterior = 0;
-      const long intervaloActualizacion = 500; // Actualización cada 500 ms
+      const long intervaloActualizacion = 500; // 500 ms para refrescar LCD
       
       void setup() {
-        Serial.begin(9600); // Inicia la comunicación serie
-        lcd.init();         // Inicializa el LCD
-        lcd.backlight();    // Enciende la retroiluminación del LCD
+        Serial.begin(9600);
+        lcd.init();
+        lcd.backlight();
       
-        // Configuración de pines de salida
         pinMode(rojo, OUTPUT);
         pinMode(verde, OUTPUT);
         pinMode(bocina, OUTPUT);
-        pinMode(SENSOR_LLAMAS, INPUT); // Sensor de llama como entrada
+        pinMode(SENSOR_LLAMAS, INPUT);
       
-        sensores.begin(); // Inicia el sensor DS18B20
+        sensores.begin(); // Iniciar sensor DS18B20
       }
       
       void loop() {
-        unsigned long tiempoActual = millis(); // Obtiene el tiempo actual del sistema
+        unsigned long tiempoActual = millis();
       
-        // Solicita la temperatura al sensor DS18B20
         sensores.requestTemperatures();  
-        float temperatura = sensores.getTempCByIndex(0); // Obtiene la temperatura en grados Celsius
+        float temperatura = sensores.getTempCByIndex(0);  // Obtener temperatura en Celsius
       
-        // Lee los valores de los sensores de gas y llama
         int lectura_gas = analogRead(sensor_gas);
-        int estado_llama = digitalRead(SENSOR_LLAMAS); // LOW indica fuego detectado
+        int estado_llama = digitalRead(SENSOR_LLAMAS); // Leer el sensor de llama como un botón
       
         Serial.print("Llama (digital): ");
         Serial.println(estado_llama);
       
-        // Determina si hay un incremento brusco de temperatura (mayor a 3°C respecto a la última lectura)
-        bool incremento_brusco = abs(temperatura - ultima_temperatura) > 3;
+        bool incremento_brusco = abs(temperatura - ultima_temperatura) > 5;
       
-        //  Si detecta fuego (estado_llama == 0), activa la alarma
-        if (estado_llama == LOW) { 
+        // 🔥 Si detecta fuego (estado_llama == 0), activar alarma
+        if (estado_llama == LOW) { // LOW significa que detecta fuego
           Serial.println("¡ALERTA! FUEGO DETECTADO");
           digitalWrite(rojo, HIGH);
           digitalWrite(verde, LOW);
@@ -303,12 +293,13 @@ Para mejorar la efectividad del sistema, se proponen las siguientes líneas de t
           digitalWrite(bocina, LOW);
         }
       
-        // Si han pasado 500 ms, se actualiza la pantalla LCD
+        // Si ha pasado 500 ms, actualizar la pantalla LCD
         if (tiempoActual - tiempoAnterior >= intervaloActualizacion) {
-          tiempoAnterior = tiempoActual; // Se actualiza el tiempo de referencia
-          lcd.clear(); // Se limpia la pantalla para mostrar nuevos datos
+          tiempoAnterior = tiempoActual;
+          lcd.clear();
       
-          if (incremento_brusco || estado_llama == LOW) { // Si hay fuego o cambio brusco de temperatura
+          if (incremento_brusco || estado_llama == LOW || (temperatura > 30 && lectura_gas > 400)) { 
+            // 🔥 Mostrar alerta si hay fuego, incremento brusco o alta temperatura con gas elevado
             lcd.setCursor(0, 0);
             lcd.print("ALERTA: FUEGO");
       
@@ -320,7 +311,6 @@ Para mejorar la efectividad del sistema, se proponen las siguientes líneas de t
             digitalWrite(bocina, HIGH);
           } 
           else {
-            // Muestra la temperatura y el nivel de gas en el LCD
             lcd.setCursor(0, 0);
             lcd.print("Temp: ");
             lcd.print(temperatura);
@@ -330,24 +320,20 @@ Para mejorar la efectividad del sistema, se proponen las siguientes líneas de t
             lcd.print("Gas: ");
             lcd.print(lectura_gas);
       
-            // Si el nivel de gas supera 400, enciende alerta, de lo contrario, luz verde
-            if (lectura_gas > 400) {
+            if (lectura_gas > 400 || temperatura > 30) {
               digitalWrite(rojo, HIGH);
               digitalWrite(verde, LOW);
             } else {
               digitalWrite(rojo, LOW);
               digitalWrite(verde, HIGH);
             }
-      
-            // Activa la bocina si la temperatura es mayor a 15°C y el gas es alto (>400)
-            digitalWrite(bocina, (temperatura > 15 && lectura_gas > 400) ? HIGH : LOW);
+            
+            digitalWrite(bocina, (temperatura > 30 && lectura_gas > 400) ? HIGH : LOW);
           }
         }
       
-        // Guarda la temperatura actual para la próxima comparación
         ultima_temperatura = temperatura;
-      
-        delay(200); // Pequeña pausa antes de la próxima iteración
+        delay(200);
       }
 
 ### Implementacion Fisica

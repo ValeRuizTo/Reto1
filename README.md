@@ -125,7 +125,7 @@ Se incluyen los diagramas UML para representar la lógica del software desarroll
 
 *Estado: Detección de Gas Alto*
   - Activa LED rojo
-  - Si `lectura_gas > 400 && temperatura > 15` → Transición a Alarma Activada
+  - Si `lectura_gas > 400 && temperatura > 30` → Transición a Alarma Activada
   - Si `lectura_gas <= 400` → Transición a Monitoreo Normal
 
 *Estado: Detección de Llama*

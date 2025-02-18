@@ -26,7 +26,7 @@ Este documento se divide en las siguientes secciones:
 
 ***Técnicas***
 - Uso de un Arduino Uno como microcontrolador central. Ya que "es una plataforma de desarrollo basada en una placa electrónica de hardware libre que incorpora un microcontrolador re-programable y una serie de pines hembra" [1], esto permite establecer conexiones entre el microcontrolador y los sendroes y actuadores, tiene entradas analogas y digitales.
-- Sensor de temperatura KY-028, "permite medir la temperatura a través de un termistor NTC, un comparador LM393, y un potenciometro"[2], esto le permite al sensor adecuar una señal de trabajo operable digital.
+- Sensor de temperatura DS18B20, "permite medir la temperatura a través de un termistor NTC, un comparador LM393, y un potenciometro"[2], esto le permite al sensor adecuar una señal de trabajo operable digital.
 - Sensor de gas (MQ-2), "Este sensor es adecuado para detectar GLP, I-butano, propano, metano, alcohol, hidrógeno y humo. Tiene alta sensibilidad y respuesta rápida"[3], ademas de esto cuenta con un potenciometrp para ajustar la sensibilidad.
 - Sensor de Llama (KY-026). "Consta de un LED receptor de infrarrojos de 5 mm, un comparador diferencial dual LM393, un potenciómetro de recorte de 3296 W, 6 resistencias, y 4 pines de cabezal macho"[4] Es decir que detecta la luz infrarroja emitida por el fuego, y debido a su potenciometro se puede ajustar su sensibilidad.
 - Pantalla LCD para visualización de datos en tiempo real.
@@ -185,10 +185,10 @@ Los resultados obtenidos en las pruebas de detección fueron satisfactorios en l
 
 | **Prueba**                  | **Condición Simulada**                 | **Respuesta Esperada**                              | **Respuesta Observada** |
 |-----------------------------|----------------------------------------|----------------------------------------------------|-------------------------|
-| **Detección de llama**       | Encendido de una llama cercana        | Activación de buzzer y alerta en LCD              | ✅ Correcto              |
+| **Detección de llama**       | Encendido de una llama cercana        | Activación de buzzer/LED y alerta en LCD              | ✅ Correcto              |
 | **Detección de gas**         | Exposición a gas (tapando el sesnor, soplando y con el encendedor sin prender)           | Cambio de LED verde a rojo                        | ✅ Correcto              |
-| **Aumento de temperatura**   | Temperatura > 30°C                    | Activación de alerta en LCD y buzzer              | ✅ Correcto              |
-| **Combinación de factores**  | Temperatura alta + gas + llama        | Activación total de alarmas                       | ✅ Correcto              |
+| **Aumento de temperatura**   | Temperatura > 30°C                    | Cambio de LED verde a rojo             | ✅ Correcto              |
+| **Combinación de factores**  | Temperatura alta + gas        | Activación total de alarmas (Buzzer, led, lcd)                       | ✅ Correcto              |
 
 ### 3.3 Análisis de los Resultados
 Los resultados muestran que el sistema es capaz de detectar condiciones de incendio de manera efectiva. Sin embargo, se identificaron algunos aspectos de mejora:

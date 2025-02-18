@@ -187,7 +187,7 @@ Los resultados obtenidos en las pruebas de detección fueron satisfactorios en l
 |-----------------------------|----------------------------------------|----------------------------------------------------|-------------------------|
 | **Detección de llama**       | Encendido de una llama cercana        | Activación de buzzer y alerta en LCD              | ✅ Correcto              |
 | **Detección de gas**         | Exposición a gas (tapando el sesnor, soplando y con el encendedor sin prender)           | Cambio de LED verde a rojo                        | ✅ Correcto              |
-| **Aumento de temperatura**   | Temperatura > 15°C                    | Activación de alerta en LCD y buzzer              | ✅ Correcto              |
+| **Aumento de temperatura**   | Temperatura > 30°C                    | Activación de alerta en LCD y buzzer              | ✅ Correcto              |
 | **Combinación de factores**  | Temperatura alta + gas + llama        | Activación total de alarmas                       | ✅ Correcto              |
 
 ### 3.3 Análisis de los Resultados
